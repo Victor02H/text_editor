@@ -6,9 +6,11 @@ import { AiOutlineAlignLeft, AiOutlineBold, AiOutlineUnderline } from "react-ico
 export default function Home() {
   const textarea = useRef();
 
+  const [fullContent, setFullContent] = useState(null);
   const [content, setContent] = useState(null);
   const [fontWeight, setFontWeight] = useState("normal");
   const [textSelected, setTextSelected] = useState(null);
+  // const [definitiveContent, setDefinitiveContent] = useState(null);
 
   const [selectPositionStart, setSelectPositionStart] = useState(null);
   const [selectPositionEnd, setSelectPositionEnd] = useState(null);
@@ -20,8 +22,31 @@ export default function Home() {
       setSelectPositionEnd(e.target.selectionEnd);
     });
 
-    console.log(selectPositionStart, selectPositionEnd)
-    console.log(textSelected)
+    copyOriginalText();
+  }
+
+  function copyOriginalText() {
+    setFullContent(textarea.current.value);
+  }
+
+  function createStrongElement() {
+    let strongElement = document.createElement("strong");
+
+    if (selectPositionStart !== null && selectPositionEnd !== null) {
+      return insertStrongElementInText(strongElement);
+    }
+
+    return false;
+  }
+
+  function insertStrongElementInText(strongElement) {
+    strongElement.append(textSelected);
+
+    setContent(fullContent.replace(textSelected, strongElement.outerHTML));
+
+    // setDefinitiveContent(fullContent.replace(textSelected, content));
+
+    // console.log(definitiveContent)
   }
 
   return (
@@ -36,14 +61,14 @@ export default function Home() {
       <main className="container">
         <div className='col-12 row justify-content-center align-items-center vh-100'>
           <div className="col-12">
-            <p className='col-12'>{textSelected}</p>
+            <div className='col-12' contentEditable="true" dangerouslySetInnerHTML={{ __html: content }}></div>
 
             <div className='col-12 row gap-1 bg-dark p-2 m-0'>
               <button className='col-auto border-0'>
                 <AiOutlineAlignLeft />
               </button>
 
-              <button className='col-auto border-0' onClick={() => setFontWeight("bold")}>
+              <button className='col-auto border-0' onClick={() => createStrongElement()}>
                 <AiOutlineBold />
               </button>
 
@@ -58,7 +83,6 @@ export default function Home() {
                 name="editor"
                 rows="10"
                 className='col-12 p-2 outline-0'
-                onChange={(e) => setContent(e.target.value)}
                 style={{ resize: "none", outline: "none", fontWeight: `${fontWeight === "bold" ? "bold" : "normal"}` }}
               >
 
